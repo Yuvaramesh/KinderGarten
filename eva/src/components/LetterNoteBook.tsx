@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from "react"
+import type React from "react"
+import { useRef, useState, useEffect } from "react"
 import { Button } from "./ui/button"
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -11,6 +12,7 @@ const InteractiveNotebook: React.FC = () => {
   const [brushSize, setBrushSize] = useState(5)
   const [drawingColor, setDrawingColor] = useState("#000000")
   const [isErasing, setIsErasing] = useState(false)
+  const [isLetterPractice, setIsLetterPractice] = useState(true)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -19,10 +21,14 @@ const InteractiveNotebook: React.FC = () => {
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         drawLines(ctx)
-        drawLetters(ctx)
+        if (isLetterPractice) {
+          drawLetters(ctx)
+        } else {
+          drawDefaultLines(ctx)
+        }
       }
     }
-  }, [currentPage]) // Draw only default content here
+  }, [isLetterPractice, currentPage])
 
   const drawLines = (ctx: CanvasRenderingContext2D) => {
     const rowHeight = 120
@@ -48,6 +54,55 @@ const InteractiveNotebook: React.FC = () => {
       const letter = ALPHABET[startIndex + i] || ""
       ctx.fillText(letter, i * letterWidth + letterWidth / 2 - 40, 40)
     }
+  }
+
+  const drawDefaultLines = (ctx: CanvasRenderingContext2D) => {
+    const firstRedLineY = 2
+    const secondBlueLineY = 40
+    const lineGap = 10
+    const canvasWidth = ctx.canvas.width
+    const canvasHeight = ctx.canvas.height
+
+    ctx.lineWidth = 3
+    ctx.strokeStyle = "#333333"
+
+    ctx.beginPath()
+    ctx.moveTo(0, firstRedLineY)
+    ctx.lineTo(canvasWidth * 0.25, secondBlueLineY)
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(canvasWidth * 0.25, firstRedLineY)
+    ctx.lineTo(canvasWidth * 0.5, secondBlueLineY)
+    ctx.stroke()
+
+    ctx.beginPath()
+    const centerX = canvasWidth * 0.75
+    ctx.moveTo(centerX, firstRedLineY)
+    ctx.lineTo(centerX, secondBlueLineY)
+    ctx.stroke()
+
+    ctx.beginPath()
+    const centerY = (firstRedLineY + secondBlueLineY) / 2
+    ctx.moveTo(canvasWidth * 0.5, centerY)
+    ctx.lineTo(canvasWidth * 0.75, centerY)
+    ctx.stroke()
+
+    ctx.fillStyle = "#999999"
+    for (let i = 0; i < 4; i++) {
+      for (let j = 1; j < 4; j++) {
+        ctx.beginPath()
+        ctx.arc(canvasWidth * (i * 0.25 + 0.125), j * lineGap, 2, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+
+    ctx.font = "14px Arial"
+    ctx.fillStyle = "#666666"
+    ctx.fillText("Right Slant", 10, 4 * lineGap + 15)
+    ctx.fillText("Left Slant", canvasWidth * 0.25 + 10, 4 * lineGap + 15)
+    ctx.fillText("Straight", canvasWidth * 0.5 + 10, 4 * lineGap + 15)
+    ctx.fillText("Horizontal", canvasWidth * 0.75 + 10, 4 * lineGap + 15)
   }
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -110,23 +165,28 @@ const InteractiveNotebook: React.FC = () => {
   }
 
   const nextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(ALPHABET.length / 4) - 1))
+    if (isLetterPractice) {
+      setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(ALPHABET.length / 4) - 1))
+    }
   }
 
   const prevPage = () => {
-    setCurrentPage((prev) => Math.max(0, prev - 1))
+    if (isLetterPractice) {
+      setCurrentPage((prev) => Math.max(0, prev - 1))
+    }
+  }
+
+  const togglePracticeType = () => {
+    setIsLetterPractice((prev) => !prev)
+    setCurrentPage(0)
+    clearCanvas()
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white p-4 rounded-lg shadow-lg">
         <div className="relative">
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={480}
-            className="absolute top-0 left-0 pointer-events-none"
-          />
+          <canvas ref={canvasRef} width={800} height={480} className="absolute top-0 left-0 pointer-events-none" />
           <canvas
             ref={tempCanvasRef}
             width={800}
@@ -142,11 +202,11 @@ const InteractiveNotebook: React.FC = () => {
           />
         </div>
         <div className="mt-4 flex justify-between items-center">
-          <Button onClick={prevPage} disabled={currentPage === 0}>
+          <Button onClick={prevPage} disabled={!isLetterPractice || currentPage === 0}>
             Previous Page
           </Button>
           <Button onClick={clearCanvas}>Clear Page</Button>
-          <Button onClick={nextPage} disabled={currentPage === Math.ceil(ALPHABET.length / 4) - 1}>
+          <Button onClick={nextPage} disabled={!isLetterPractice || currentPage === Math.ceil(ALPHABET.length / 4) - 1}>
             Next Page
           </Button>
         </div>
@@ -175,7 +235,14 @@ const InteractiveNotebook: React.FC = () => {
             {isErasing ? "Switch to Brush" : "Eraser"}
           </Button>
         </div>
-        <p className="mt-2 text-center text-gray-600">Page {currentPage + 1}</p>
+        <div className="mt-4 flex justify-center">
+          <Button onClick={togglePracticeType}>
+            Switch to {isLetterPractice ? "Line Practice" : "Letter Practice"}
+          </Button>
+        </div>
+        <p className="mt-2 text-center text-gray-600">
+          {isLetterPractice ? `Letter Practice - Page ${currentPage + 1}` : "Line Practice"}
+        </p>
       </div>
     </div>
   )
