@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Baloo+Chettan+2&family=Calligraffitti&display=swap");
+.texteffect {
+  font-family: "Calligraffitti", cursive;
+  text-shadow: -15px 5px 20px #ced0d3;
+  letter-spacing: 0.02em;
+  color: #f9f8f7;
+  text-shadow: 5px 5px 0px #901ab0;
+  /* 10px 10px 0px #ffd662,
+    15px 15px 0px #ff80bf,
+    20px 20px 0px #ef5097; */
+}
+
+.texteffect2 {
+  font-family: "Calligraffitti", cursive;
+  text-shadow: -15px 5px 20px #ced0d3;
+  letter-spacing: 0.02em;
+  color: #901ab0;
+  text-shadow: 5px 5px 0px #f9f8f7;
+  /* 10px 10px 0px #ffd662,
+    15px 15px 0px #ff80bf,
+    20px 20px 0px #ef5097; */
+}
+
+.ltor {
+  animation: ltor 0.7s linear;
+}
+.ttob {
+  animation: ttob 0.7s linear forwards;
+}
+
+.btot {
+  transform: translateY(100%);
+  animation: btot 0.5s linear 1s forwards;
+}
+
+@keyframes ltor {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes ttob {
+  from {
+    transform: translateY(-200%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+@keyframes btot {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
