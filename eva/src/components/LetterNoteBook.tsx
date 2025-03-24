@@ -218,10 +218,11 @@ const InteractiveNotebook: React.FC = () => {
       >
         <img
           src="/shin-chan.gif"
-          className=" rounded-2xl"
+          className=" rounded-2xl w-36 h-96"
           alt="Shin-chan"
-          width={70}
-          height={70}
+
+          width={350}
+          height={150}
         />
       </div>
       {isChatOpen && (

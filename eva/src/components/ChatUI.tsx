@@ -20,7 +20,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
     {
       key: 1,
       image: imageSrc,
-      text: "healasdf afd adsf asl;dfjal;sdfja;lsdjfa;sdjf;lajsdf;asjdf;aljsdfl;ajf;lajdsfl;ajsfd",
+      text: "Analyze this image and give feedback",
       isUser: true,
     },
   ]);
