@@ -2,6 +2,7 @@ import LetterNoteBook from "./components/LetterNoteBook";
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Heropage from "./pages/Hero";
+import StrokeTeachingPage from "./components/StrokeTeachingPage";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route element={<Heropage />} path="/"></Route>
         <Route element={<LetterNoteBook />} path="/letternotebook"></Route>
+        <Route element={<StrokeTeachingPage />} path="/stroke"></Route>
       </Routes>
     </div>
   );

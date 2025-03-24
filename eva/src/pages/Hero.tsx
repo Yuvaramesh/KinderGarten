@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import Hero_card from "./Hero_card";
 
 const ImageView = () => {
-
   return (
     <div className={` relative flex-1`}>
       <div className=" relative h-1/2 w-full ">
@@ -47,12 +46,11 @@ const ImageView = () => {
 const Heropage = () => {
   const navigate = useNavigate();
   return (
-    <div >
+    <>
       <GridBackgroundDemo>
         <div className="  relative grid h-screen w-full grid-cols-[1.5fr_1fr] grid-rows-1">
           <div className="   ml-32 flex flex-col  justify-center gap-9 px-10 ">
             <div>
-
               <h2 className={` texteffect  mt-10 text-6xl font-bold uppercase`}>
                 EVA
                 <img
@@ -73,7 +71,10 @@ const Heropage = () => {
                 dynamic learning tools.
               </p>
             </div>
-            <Button onClick={() => navigate("/letternotebook")} className="">
+            <Button
+              onClick={() => navigate("/letternotebook")}
+              className=" bg-black text-white"
+            >
               Get Started
             </Button>
           </div>
@@ -84,7 +85,7 @@ const Heropage = () => {
       <GridBackgroundDemo>
         <Hero_card />
       </GridBackgroundDemo>
-    </div>
+    </>
   );
 };
 

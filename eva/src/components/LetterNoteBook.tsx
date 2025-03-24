@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import ChatUI from "./ChatUI";
+import { GenerateText } from "../lib/model";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -15,6 +16,7 @@ const InteractiveNotebook: React.FC = () => {
   const [isErasing, setIsErasing] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageInlineData, setImageInlineData] = useState<any | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -127,6 +129,28 @@ const InteractiveNotebook: React.FC = () => {
     setCurrentPage((prev) => Math.max(0, prev - 1));
   };
 
+  const generateFeedBack = async (base64: string) => {
+    try {
+      // Send the Base64 image to Gemini AI
+      console.log("Sending image to lama I...");
+
+      const aiResponse = await GenerateText(base64);
+      console.log(aiResponse);
+
+      // Update the messages with the AI response
+      // setMessages((prevMessages) => [
+      //   ...prevMessages,
+      //   {
+      //     key: prevMessages.length + 1,
+      //     text: aiResponse.message,
+      //     isUser: false,
+      //   },
+      // ]);
+    } catch (error) {
+      console.error("Error sending image to Gemini AI:", error);
+    }
+  };
+
   const captureCanvas = () => {
     const tempCanvas = tempCanvasRef.current;
     const mainCanvas = canvasRef.current;
@@ -144,8 +168,11 @@ const InteractiveNotebook: React.FC = () => {
 
     // Capture the merged canvas as a Base64 image
     const base64Image = mergedCanvas.toDataURL("image/png"); // Base64 data URL
-    setImageSrc(base64Image);
-    setIsChatOpen(true);
+    const base64Data = base64Image.split(",")[1]; // Remove the "data:image/png;base64," prefix
+    const mimeType = base64Image.split(";")[0].split(":")[1];
+    generateFeedBack(base64Data);
+    // setImageSrc(base64Image);
+    // setIsChatOpen(true);
   };
 
   return (

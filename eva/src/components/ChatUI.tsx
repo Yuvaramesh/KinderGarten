@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { sendImageToGemini } from "../lib/model";
 
 interface Message {
   key: number;
-  text: string;
+  text?: string;
   image?: string;
   isUser?: boolean;
 }
@@ -15,7 +14,6 @@ interface ChatUIProps {
 }
 
 const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
-  const [imageInlineData, setImageInlineData] = useState<any | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       key: 1,
@@ -26,56 +24,54 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
   ]);
 
   // Convert imageSrc to the format required by Gemini API
-  useEffect(() => {
-    const convertImageSrcToInlineData = async () => {
-      if (imageSrc) {
-        console.log(imageSrc);
+  // useEffect(() => {
+  //   const convertImageSrcToInlineData = async () => {
+  //     if (imageSrc) {
+  //       console.log(imageSrc);
 
-        const base64Data = imageSrc.split(",")[1]; // Remove the "data:image/png;base64," prefix
-        const mimeType = imageSrc.split(";")[0].split(":")[1]; // Extract MIME type
+  //       const base64Data = imageSrc.split(",")[1]; // Remove the "data:image/png;base64," prefix
+  //       const mimeType = imageSrc.split(";")[0].split(":")[1]; // Extract MIME type
 
-        setImageInlineData({
-          inlineData: {
-            data: base64Data,
-            mimeType,
-          },
-        });
-      }
-    };
+  //       setImageInlineData({
+  //         inlineData: {
+  //           data: base64Data,
+  //           mimeType,
+  //         },
+  //       });
+  //     }
+  //   };
 
-    convertImageSrcToInlineData();
-  }, [imageSrc]);
+  //   convertImageSrcToInlineData();
+  // }, [imageSrc]);
 
   const handleSendToGemini = async () => {
-    if (!imageInlineData) {
-      console.error("No image data available.");
-      return;
-    }
-
-    try {
-      // Send the Base64 image to Gemini AI
-      const aiResponse = await sendImageToGemini(imageInlineData);
-
-      // Update the messages with the AI response
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          key: prevMessages.length + 1,
-          text: aiResponse,
-          isUser: false,
-        },
-      ]);
-    } catch (error) {
-      console.error("Error sending image to Gemini AI:", error);
-    }
+    // if (!imageInlineData) {
+    //   console.error("No image data available.");
+    //   return;
+    // }
+    // try {
+    //   // Send the Base64 image to Gemini AI
+    //   const aiResponse = await GenerateText(imageInlineData);
+    //   // Update the messages with the AI response
+    //   setMessages((prevMessages) => [
+    //     ...prevMessages,
+    //     {
+    //       key: prevMessages.length + 1,
+    //       text: aiResponse,
+    //       isUser: false,
+    //     },
+    //   ]);
+    // } catch (error) {
+    //   console.error("Error sending image to Gemini AI:", error);
+    // }
   };
 
   // Automatically send to Gemini when imageInlineData is set
-  useEffect(() => {
-    if (imageInlineData) {
-      handleSendToGemini();
-    }
-  }, [imageInlineData]);
+  // useEffect(() => {
+  //   if (imageInlineData) {
+  //     handleSendToGemini();
+  //   }
+  // }, [imageInlineData]);
 
   // Split text into lines for line-by-line typing
   const renderTextWithTypingEffect = (text: string) => {
@@ -99,8 +95,9 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
         {messages.map((message) => (
           <div
             key={message.key}
-            className={`mb-2 p-2 rounded-lg ${message.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
-              } max-w-[80%]`}
+            className={`mb-2 p-2 rounded-lg ${
+              message.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
+            } max-w-[80%]`}
           >
             {message.image && (
               <img
@@ -109,10 +106,12 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
                 className="mt-2 rounded-lg"
               />
             )}
-            {message.text ? (
-              <p>{renderTextWithTypingEffect(message.text)}</p>
-            ) : (
-              <p>...processing</p>
+            {message.text && (
+              <p className="text-sm">
+                {message.isUser
+                  ? message.text
+                  : renderTextWithTypingEffect(message.text)}
+              </p>
             )}
           </div>
         ))}
