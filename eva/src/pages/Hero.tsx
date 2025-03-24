@@ -3,9 +3,10 @@ import Tooltip from "../components/ui/Tooltip";
 import GridBackgroundDemo from "../components/ui/GridBackground";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "react-router-dom";
+import Hero_card from "./Hero_card";
 
 const ImageView = () => {
-  // const siva;
+
   return (
     <div className={` relative flex-1`}>
       <div className=" relative h-1/2 w-full ">
@@ -46,21 +47,19 @@ const ImageView = () => {
 const Heropage = () => {
   const navigate = useNavigate();
   return (
-    <>
+    <div >
       <GridBackgroundDemo>
-        <div className="  relative grid h-screen  w-screen grid-cols-[1.5fr_1fr] grid-rows-1">
+        <div className="  relative grid h-screen w-full grid-cols-[1.5fr_1fr] grid-rows-1">
           <div className="   ml-32 flex flex-col  justify-center gap-9 px-10 ">
             <div>
-              <h1 className=" texteffect text-7xl font-black tracking-widest">
-                SIYA
-              </h1>
+
               <h2 className={` texteffect  mt-10 text-6xl font-bold uppercase`}>
-                Sp
+                EVA
                 <img
                   src="/speaker.png"
                   className=" ml-5 inline-block size-16"
                 />
-                ken App
+                HandWriting
               </h2>
               <p className="  text-xl capitalize leading-10 text-zinc-600">
                 <img src="/icon2.png" className=" inline-block size-8" />
@@ -82,7 +81,10 @@ const Heropage = () => {
           {/* <SlantingBox /> */}
         </div>
       </GridBackgroundDemo>
-    </>
+      <GridBackgroundDemo>
+        <Hero_card />
+      </GridBackgroundDemo>
+    </div>
   );
 };
 

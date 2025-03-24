@@ -20,7 +20,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
     {
       key: 1,
       image: imageSrc,
-      text: "healasdf afd adsf asl;dfjal;sdfja;lsdjfa;sdjf;lajsdf;asjdf;aljsdfl;ajf;lajdsfl;ajsfd",
+      text: "Analyze this image and give feedback",
       isUser: true,
     },
   ]);
@@ -29,6 +29,8 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
   useEffect(() => {
     const convertImageSrcToInlineData = async () => {
       if (imageSrc) {
+        console.log(imageSrc);
+
         const base64Data = imageSrc.split(",")[1]; // Remove the "data:image/png;base64," prefix
         const mimeType = imageSrc.split(";")[0].split(":")[1]; // Extract MIME type
 
@@ -97,9 +99,8 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
         {messages.map((message) => (
           <div
             key={message.key}
-            className={`mb-2 p-2 rounded-lg ${
-              message.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
-            } max-w-[80%]`}
+            className={`mb-2 p-2 rounded-lg ${message.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
+              } max-w-[80%]`}
           >
             {message.image && (
               <img
@@ -118,7 +119,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, imageSrc }) => {
       </div>
       <div className="p-2 border-t border-gray-300">
         <Button onClick={handleSendToGemini} className="w-full">
-          Send to Gemini AI
+          Send to LLAMA AI
         </Button>
       </div>
     </div>

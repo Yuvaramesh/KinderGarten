@@ -9,7 +9,7 @@ const Tooltip = ({ className }: { className: ClassValue }) => {
         "flex items-center justify-center bg-white/10 shadow-sm shadow-black backdrop-blur-sm"
       )}
     >
-      <span className=" inline-block align-middle">siva</span>
+      <span className=" inline-block align-middle">EVA</span>
     </div>
   );
 };
