@@ -247,7 +247,6 @@ const InteractiveNotebook: React.FC = () => {
           src="/shin-chan.gif"
           className=" rounded-2xl w-36 h-96"
           alt="Shin-chan"
-
           width={350}
           height={150}
         />

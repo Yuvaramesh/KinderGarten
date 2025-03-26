@@ -48,6 +48,9 @@ export default function Hero_card() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: tech.delay, duration: 0.5 }}
                   className="h-full cursor-pointer "
+                  onClick={() => {
+                    window.location.href = "http://localhost:8501";
+                  }}
                 >
                   <Card className="group hover:shadow-lg w-[27rem] transition-all duration-300 backdrop-blur-sm border-border    dark:hover:from-gray-800 dark:hover:to-gray-700 h-full flex flex-col">
                     <CardContent className="p-6 flex-grow flex flex-col justify-between">
