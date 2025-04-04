@@ -1,47 +1,50 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { GlobeIcon, ChevronDownIcon } from 'lucide-react';
-import { Language } from '@/types';
+} from "@/components/ui/dropdown-menu";
+import { GlobeIcon, ChevronDownIcon } from "lucide-react";
+import { Language } from "@/types";
 
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const languages=[{
-    code:"en",
-    name:"English"
-  },{
-    code:"ta",
-    name:"Tamil"
-  }]
-  const isLoading=false
+  const languages = [
+    {
+      code: "en",
+      name: "English",
+    },
+    {
+      code: "ta",
+      name: "Tamil",
+    },
+  ];
+  const isLoading = false;
   // Fetch available languages from API
-   
-
 
   // Find current language
-  const currentLanguage = languages?.find((lang: Language) => lang.code === i18n.language) || { 
-    code: 'en', 
-    name: 'English' 
+  const currentLanguage = languages?.find(
+    (lang: Language) => lang.code === i18n.language
+  ) || {
+    code: "en",
+    name: "English",
   };
 
   const changeLanguage = (code: string) => {
     i18n.changeLanguage(code);
-    localStorage.setItem('language', code);
+    localStorage.setItem("language", code);
     setIsOpen(false);
   };
 
   // Set initial language from localStorage
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
+    const savedLanguage = localStorage.getItem("language");
     if (savedLanguage) {
       i18n.changeLanguage(savedLanguage);
     }
@@ -64,7 +67,9 @@ const LanguageSelector = () => {
             <DropdownMenuItem
               key={language.code}
               onClick={() => changeLanguage(language.code)}
-              className={`cursor-pointer ${language.code === i18n.language ? 'bg-accent/50' : ''}`}
+              className={`cursor-pointer text-white ${
+                language.code === i18n.language ? "bg-accent/50" : ""
+              }`}
             >
               {language.name}
             </DropdownMenuItem>
