@@ -15,10 +15,17 @@ const LanguageSelector = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const languages=['tamil']
+  const languages=[{
+    code:"en",
+    name:"English"
+  },{
+    code:"ta",
+    name:"Tamil"
+  }]
   const isLoading=false
   // Fetch available languages from API
- 
+   
+
 
   // Find current language
   const currentLanguage = languages?.find((lang: Language) => lang.code === i18n.language) || { 
