@@ -3,6 +3,9 @@
 import type React from "react";
 import { useRef, useState, useEffect } from "react";
 import { Button } from "./ui/button";
+import { geminiVision } from "@/lib/gemini-vision";
+import i18n from "@/i18n/i18n";
+import ChatUI from "./ChatUI";
 
 interface Stroke {
   id: string;
@@ -15,6 +18,13 @@ interface Stroke {
     width: number,
     height: number
   ) => void;
+}
+
+interface Message {
+  key: number;
+  text?: string;
+  image?: string;
+  isUser?: boolean;
 }
 
 const strokes: Stroke[] = [
@@ -71,9 +81,13 @@ const strokes: Stroke[] = [
     description:
       "Draw a curve that opens to the right. Used in parentheses and letters like 'c', 'e'.",
     drawFunction: (ctx, x, y, width, height) => {
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      const radius = Math.min(width, height) / 2;
+
       ctx.beginPath();
-      ctx.moveTo(x + width * 0.6, y);
-      ctx.quadraticCurveTo(x, y + height / 2, x + width * 0.6, y + height);
+      // Draw left half of a circle (from top to bottom, clockwise)
+      ctx.arc(centerX, centerY, radius, 1.5 * Math.PI, 0.5 * Math.PI, true);
       ctx.stroke();
     },
   },
@@ -83,32 +97,13 @@ const strokes: Stroke[] = [
     description:
       "Draw a curve that opens to the left. Used in parentheses and letters like 'd', 'b'.",
     drawFunction: (ctx, x, y, width, height) => {
-      ctx.beginPath();
-      ctx.moveTo(x + width * 0.4, y);
-      ctx.quadraticCurveTo(
-        x + width,
-        y + height / 2,
-        x + width * 0.4,
-        y + height
-      );
-      ctx.stroke();
-    },
-  },
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      const radius = Math.min(width, height) / 2;
 
-  {
-    id: "hook",
-    name: "Hook (ɾ)",
-    description: "Draw a hook shape. Used in letters like 'r', 'n', 'm'.",
-    drawFunction: (ctx, x, y, width, height) => {
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + height * 0.7);
-      ctx.quadraticCurveTo(
-        x + width * 0.3,
-        y + height,
-        x + width,
-        y + height * 0.7
-      );
+      // Draw right half of a circle: from top (1.5π) to bottom (0.5π)
+      ctx.arc(centerX, centerY, radius, 1.5 * Math.PI, 0.5 * Math.PI, false);
       ctx.stroke();
     },
   },
@@ -122,6 +117,8 @@ const StrokeTeachingPage: React.FC = () => {
   const [drawingColor, setDrawingColor] = useState("#000000");
   const [isErasing, setIsErasing] = useState(false);
   const [currentStroke, setCurrentStroke] = useState<Stroke>(strokes[0]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -239,6 +236,63 @@ const StrokeTeachingPage: React.FC = () => {
     }
   };
 
+  const generateFeedBack = async (base64: string) => {
+    try {
+      // Send the Base64 image to Gemini AI
+      console.log("Sending image to lama I...");
+
+      const aiResponse = await geminiVision("", base64, i18n.language);
+
+      // Update the messages with the AI response
+      return aiResponse;
+    } catch (error) {
+      console.error("Error sending image to Gemini AI:", error);
+    }
+  };
+
+  const captureCanvas = async () => {
+    const tempCanvas = tempCanvasRef.current;
+    const mainCanvas = canvasRef.current;
+
+    // Create a new canvas to merge the content
+    const mergedCanvas = document.createElement("canvas");
+    mergedCanvas.width = 800; // Set the same width as your canvases
+    mergedCanvas.height = 480; // Set the same height as your canvases
+    const mergedContext = mergedCanvas.getContext("2d");
+    // Draw the first canvas onto the merged canvas
+    mergedContext?.drawImage(tempCanvas!, 0, 0);
+
+    // Draw the second canvas onto the merged canvas
+    mergedContext?.drawImage(mainCanvas!, 0, 0);
+
+    // Capture the merged canvas as a Base64 image
+    const base64Image = mergedCanvas.toDataURL("image/png"); // Base64 data URL
+    const base64Data = base64Image.split(",")[1]; // Remove the "data:image/png;base64," prefix
+
+    // Step 1: Add image-only message
+    setMessages((prev) => {
+      const newMessage = {
+        key: prev.length,
+        image: base64Image,
+        isUser: true,
+        text: "", // initially empty
+      };
+      return [...prev, newMessage];
+    });
+    setIsChatOpen(true);
+    // Step 2: Generate response and update the last message
+    const res = await generateFeedBack(base64Data);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        key: prev.length + 1,
+        text: res,
+        isUser: false,
+      },
+    ]);
+  };
+
   return (
     <div className="max-w-4xl mx-auto bg-white p-4 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4">Learn Basic Strokes</h2>
@@ -275,7 +329,7 @@ const StrokeTeachingPage: React.FC = () => {
           <Button
             key={stroke.id}
             onClick={() => setCurrentStroke(stroke)}
-            variant={currentStroke.id === stroke.id ? "default" : "outline"}
+            variant={currentStroke.id === stroke.id ? "default" : "secondary"}
           >
             {stroke.name}
           </Button>
@@ -308,8 +362,26 @@ const StrokeTeachingPage: React.FC = () => {
           <Button onClick={() => setIsErasing((prev) => !prev)}>
             {isErasing ? "Switch to Brush" : "Eraser"}
           </Button>
+          <Button variant={"secondary"} onClick={captureCanvas}>
+            Feedback
+          </Button>
         </div>
       </div>
+      <div
+        className="fixed bottom-12 right-12 cursor-pointer"
+        onClick={() => setIsChatOpen(true)}
+      >
+        <img
+          src="/shin-chan.gif"
+          className=" rounded-2xl w-24 h-24"
+          alt="Shin-chan"
+          width={150}
+          height={150}
+        />
+      </div>
+      {isChatOpen && (
+        <ChatUI messages={messages} onClose={() => setIsChatOpen(false)} />
+      )}
     </div>
   );
 };

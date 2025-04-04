@@ -1,9 +1,17 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import ChatUI from "./ChatUI";
-import { GenerateText } from "../lib/model";
+import { geminiVision } from "@/lib/gemini-vision";
+import i18n from "@/i18n/i18n";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+interface Message {
+  key: number;
+  text?: string;
+  image?: string;
+  isUser?: boolean;
+}
 
 const InteractiveNotebook: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,8 +23,7 @@ const InteractiveNotebook: React.FC = () => {
   const [drawingColor, setDrawingColor] = useState("#000000");
   const [isErasing, setIsErasing] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [imageInlineData, setImageInlineData] = useState<any | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -134,24 +141,16 @@ const InteractiveNotebook: React.FC = () => {
       // Send the Base64 image to Gemini AI
       console.log("Sending image to lama I...");
 
-      const aiResponse = await GenerateText(base64);
-      console.log(aiResponse);
+      const aiResponse = await geminiVision("", base64, i18n.language);
 
       // Update the messages with the AI response
-      // setMessages((prevMessages) => [
-      //   ...prevMessages,
-      //   {
-      //     key: prevMessages.length + 1,
-      //     text: aiResponse.message,
-      //     isUser: false,
-      //   },
-      // ]);
+      return aiResponse;
     } catch (error) {
       console.error("Error sending image to Gemini AI:", error);
     }
   };
 
-  const captureCanvas = () => {
+  const captureCanvas = async () => {
     const tempCanvas = tempCanvasRef.current;
     const mainCanvas = canvasRef.current;
 
@@ -169,10 +168,29 @@ const InteractiveNotebook: React.FC = () => {
     // Capture the merged canvas as a Base64 image
     const base64Image = mergedCanvas.toDataURL("image/png"); // Base64 data URL
     const base64Data = base64Image.split(",")[1]; // Remove the "data:image/png;base64," prefix
-    const mimeType = base64Image.split(";")[0].split(":")[1];
-    generateFeedBack(base64Data);
-    // setImageSrc(base64Image);
-    // setIsChatOpen(true);
+
+    // Step 1: Add image-only message
+    setMessages((prev) => {
+      const newMessage = {
+        key: prev.length,
+        image: base64Image,
+        isUser: true,
+        text: "", // initially empty
+      };
+      return [...prev, newMessage];
+    });
+    setIsChatOpen(true);
+    // Step 2: Generate response and update the last message
+    const res = await generateFeedBack(base64Data);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        key: prev.length + 1,
+        text: res,
+        isUser: false,
+      },
+    ]);
   };
 
   return (
@@ -235,7 +253,9 @@ const InteractiveNotebook: React.FC = () => {
           <Button onClick={() => setIsErasing((prev) => !prev)}>
             {isErasing ? "Switch to Brush" : "Eraser"}
           </Button>
-          <button onClick={captureCanvas}>Capture Canvas</button>
+          <Button variant={"secondary"} onClick={captureCanvas}>
+            Feedback
+          </Button>
         </div>
         <p className="mt-2 text-center text-gray-600">Page {currentPage + 1}</p>
       </div>
@@ -245,17 +265,14 @@ const InteractiveNotebook: React.FC = () => {
       >
         <img
           src="/shin-chan.gif"
-          className=" rounded-2xl w-36 h-96"
+          className=" rounded-2xl w-24 h-24"
           alt="Shin-chan"
-          width={350}
+          width={150}
           height={150}
         />
       </div>
       {isChatOpen && (
-        <ChatUI
-          imageSrc={imageSrc || ""}
-          onClose={() => setIsChatOpen(false)}
-        />
+        <ChatUI messages={messages} onClose={() => setIsChatOpen(false)} />
       )}
     </div>
   );

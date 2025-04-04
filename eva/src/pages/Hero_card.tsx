@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Brain, LetterText, LoaderCircle, PenLine } from "lucide-react";
 import { Card, CardContent } from "../components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const technologies = [
   {
@@ -9,6 +10,7 @@ const technologies = [
     description: "Line Stroke is a simple and easy to use draw Letters",
     color: "group-hover:text-purple-500",
     delay: 0.2,
+    path: "/stroke",
   },
   {
     icon: LoaderCircle,
@@ -16,6 +18,7 @@ const technologies = [
     description: "Curves is a simple and easy to use draw Letters",
     color: "group-hover:text-green-500",
     delay: 0.3,
+    path: "/stroke",
   },
   {
     icon: LetterText,
@@ -23,17 +26,21 @@ const technologies = [
     description: "Letters are the building blocks for the Handwriting",
     color: "group-hover:text-yellow-500",
     delay: 0.4,
+    path: "/letternotebook",
   },
+
   {
     icon: Brain,
     title: "AI Feedback",
     description: "AI Feedback is used to improve the Handwriting",
     color: "group-hover:text-pink-500",
     delay: 0.5,
+    path: "/hand",
   },
 ];
 
 export default function Hero_card() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-poppins">
       {/* Hero Section */}
@@ -49,7 +56,7 @@ export default function Hero_card() {
                   transition={{ delay: tech.delay, duration: 0.5 }}
                   className="h-full cursor-pointer "
                   onClick={() => {
-                    window.location.href = "http://localhost:8501";
+                    navigate(tech.path);
                   }}
                 >
                   <Card className="group hover:shadow-lg w-[27rem] transition-all duration-300 backdrop-blur-sm border-border    dark:hover:from-gray-800 dark:hover:to-gray-700 h-full flex flex-col">
