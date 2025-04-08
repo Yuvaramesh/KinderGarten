@@ -11,6 +11,8 @@ import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useToast } from "@/hooks/use-toast";
 import { geminiVision } from "@/lib/gemini-vision";
 import { IoPersonCircleSharp } from "react-icons/io5";
+import { HiSpeakerWave } from "react-icons/hi2";
+import { ElevenLabsClient } from "elevenlabs";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -45,6 +47,50 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     resetTranscript,
     isBrowserSupported: isSpeechRecognitionSupported,
   } = useSpeechRecognition();
+  const isTamil = (text: string): boolean => {
+    // Check if the content includes Tamil Unicode range
+    return /[\u0B80-\u0BFF]/.test(text);
+  };
+
+  const client = new ElevenLabsClient({
+    apiKey: "sk_0ba818c69401e475e7024a124c6a9710d01175c306905a22",
+  });
+  const elevenLabs = async (text: string) => {
+    const apiKey = "sk_0ba818c69401e475e7024a124c6a9710d01175c306905a22";
+    const voiceId = "JBFqnCBsd6RMkjVDRZzb";
+
+    try {
+      const response = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "xi-api-key": apiKey,
+          },
+          body: JSON.stringify({
+            text,
+            model_id: "eleven_multilingual_v2",
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch ElevenLabs audio");
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    } catch (error) {
+      console.error("ElevenLabs Error:", error);
+    }
+  };
 
   // Speech synthesis hook for reading responses
   const {
@@ -72,40 +118,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   useEffect(() => {
     if (
       settings.autoRead &&
-      isSpeechSynthesisSupported &&
-      messages.length > 0
+      messages.length > 0 &&
+      (isSpeechSynthesisSupported || client)
     ) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.role === "assistant") {
-        speak(lastMessage.content);
+        if (isTamil(lastMessage.content)) {
+          elevenLabs(lastMessage.content);
+        } else {
+          speak(lastMessage.content);
+        }
       }
     }
   }, [messages, settings.autoRead, speak, isSpeechSynthesisSupported]);
-
-  // // Analyze image mutation
-  // const analyzeImageMutation = useMutation({
-  //   mutationFn: async (data: ImageAnalysisRequest) => {
-  //     const response = await apiRequest('POST', '/api/analyze', data);
-  //     return response.json() as Promise<ImageAnalysisResponse>;
-  //   },
-  //   onSuccess: (data) => {
-  //     setMessages(prev => [...prev, {
-  //       role: 'assistant',
-  //       content: data.content,
-  //       timestamp: data.timestamp
-  //     }]);
-  //     setIsTyping(false);
-  //   },
-  //   onError: (error) => {
-  //     console.error('Error analyzing image:', error);
-  //     toast({
-  //       title: 'Error',
-  //       description: t('errors.general'),
-  //       variant: 'destructive',
-  //     });
-  //     setIsTyping(false);
-  //   }
-  // });
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -244,9 +269,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm text-white whitespace-pre-wrap">
-                    {message.content}
-                  </p>
+                  <div className=" group">
+                    <p className="text-sm text-white whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                    {message.role === "assistant" && (
+                      <div className=" w-full flex justify-end">
+                        <HiSpeakerWave
+                          onClick={() => {
+                            if (isTamil(message.content)) {
+                              elevenLabs(message.content);
+                            } else {
+                              speak(message.content);
+                            }
+                          }}
+                          className=" cursor-pointer group-hover:opacity-100 transition-all opacity-0 text-2xl  text-white  "
+                        />
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 interface SpeechRecognitionHook {
   isListening: boolean;
@@ -18,7 +18,7 @@ interface SpeechRecognitionEvent {
 
 export function useSpeechRecognition(): SpeechRecognitionHook {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [recognition, setRecognition] = useState<any | null>(null);
   const { i18n } = useTranslation();
@@ -27,11 +27,12 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
   // Initialize speech recognition
   useEffect(() => {
     // Check if browser supports speech recognition
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
-    
+    const SpeechRecognition =
+      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
       setIsBrowserSupported(false);
-      setError('Speech recognition is not supported in this browser.');
+      setError("Speech recognition is not supported in this browser.");
       return;
     }
 
@@ -39,16 +40,16 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
     const recognitionInstance = new SpeechRecognition();
     recognitionInstance.continuous = true;
     recognitionInstance.interimResults = true;
-    recognitionInstance.lang = i18n.language || 'en-US';
+    recognitionInstance.lang = i18n.language || "en-US";
 
     recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
-      let currentTranscript = '';
+      let currentTranscript = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
           currentTranscript += event.results[i][0].transcript;
         }
       }
-      setTranscript(prev => prev + ' ' + currentTranscript);
+      setTranscript((prev) => prev + " " + currentTranscript);
     };
 
     recognitionInstance.onerror = (event: any) => {
@@ -72,7 +73,7 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
   // Update language when it changes
   useEffect(() => {
     if (recognition) {
-      recognition.lang = i18n.language || 'en-US';
+      recognition.lang = i18n.language || "en-US";
     }
   }, [i18n.language, recognition]);
 
@@ -83,8 +84,8 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
         recognition.start();
         setIsListening(true);
       } catch (err) {
-        console.error('Error starting speech recognition:', err);
-        setError('Failed to start speech recognition');
+        console.error("Error starting speech recognition:", err);
+        setError("Failed to start speech recognition");
       }
     }
   }, [recognition]);
@@ -97,7 +98,7 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
   }, [recognition]);
 
   const resetTranscript = useCallback(() => {
-    setTranscript('');
+    setTranscript("");
   }, []);
 
   return {
@@ -107,6 +108,6 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
     stopListening,
     error,
     resetTranscript,
-    isBrowserSupported
+    isBrowserSupported,
   };
 }
