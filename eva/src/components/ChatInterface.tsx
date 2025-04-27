@@ -246,28 +246,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               >
                 {message.role === "assistant" &&
                 message.content.includes("- ") ? (
-                  <div>
-                    <p className="text-sm mb-2">
-                      {message.content.split("\n")[0]}
-                    </p>
-                    <ul className="list-disc pl-5 text-sm space-y-1">
-                      {message.content
-                        .split("\n")
-                        .filter((line) => line.trim().startsWith("- "))
-                        .map((line, idx) => (
-                          <li key={idx}>{line.substring(2)}</li>
-                        ))}
-                    </ul>
-                    <p className="text-sm mt-3">
-                      {message.content
-                        .split("\n")
-                        .filter(
-                          (line) =>
-                            !line.trim().startsWith("- ") &&
-                            line !== message.content.split("\n")[0]
-                        )
-                        .join("\n")}{" "}
-                    </p>
+                  <div className="prose text-white max-w-none">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 ) : (
                   <div className=" group">
