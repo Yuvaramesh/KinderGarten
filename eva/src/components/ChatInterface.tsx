@@ -13,6 +13,7 @@ import { geminiVision } from "@/lib/gemini-vision";
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { ElevenLabsClient } from "elevenlabs";
+import ReactMarkdown from "react-markdown";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -270,9 +271,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   </div>
                 ) : (
                   <div className=" group">
-                    <p className="text-sm text-white whitespace-pre-wrap">
-                      {message.content}
-                    </p>
+                    <div className="prose text-white max-w-none">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
                     {message.role === "assistant" && (
                       <div className=" w-full flex justify-end">
                         <HiSpeakerWave
