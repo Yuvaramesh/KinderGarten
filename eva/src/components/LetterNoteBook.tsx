@@ -173,7 +173,7 @@ const InteractiveNotebook: React.FC = () => {
     setMessages((prev) => {
       const newMessage = {
         key: prev.length,
-        image: base64Image,
+        image: base64Data,
         isUser: true,
         text: "", // initially empty
       };
