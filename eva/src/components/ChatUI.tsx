@@ -6,6 +6,7 @@ interface Message {
   text?: string;
   image?: string;
   isUser?: boolean;
+  displayImg?: string; // Optional property for displaying images
 }
 
 interface ChatUIProps {
@@ -30,9 +31,9 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, messages }) => {
               message.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
             } max-w-[80%]`}
           >
-            {message.image && (
+            {message.displayImg && (
               <img
-                src={message.image}
+                src={message.displayImg}
                 alt="User uploaded"
                 className="mt-2 rounded-lg"
               />

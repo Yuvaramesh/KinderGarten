@@ -141,7 +141,11 @@ const InteractiveNotebook: React.FC = () => {
       // Send the Base64 image to Gemini AI
       console.log("Sending image to lama I...");
 
-      const aiResponse = await geminiVision("", base64, i18n.language);
+      const aiResponse = await geminiVision(
+        "Give me the feedback for this image",
+        base64,
+        i18n.language
+      );
 
       // Update the messages with the AI response
       return aiResponse;
@@ -173,6 +177,7 @@ const InteractiveNotebook: React.FC = () => {
     setMessages((prev) => {
       const newMessage = {
         key: prev.length,
+        displayImg: base64Image,
         image: base64Data,
         isUser: true,
         text: "", // initially empty
