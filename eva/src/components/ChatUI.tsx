@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "./ui/button";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   key: number;
@@ -39,9 +40,11 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, messages }) => {
               />
             )}
             {message.text && (
-              <p className="text-sm whitespace-pre-line">
-                {message.isUser ? message.text : message.text}
-              </p>
+              <div className="prose max-w-none">
+                <ReactMarkdown>
+                  {message.isUser ? message.text : message.text}
+                </ReactMarkdown>
+              </div>
             )}
           </div>
         ))}
