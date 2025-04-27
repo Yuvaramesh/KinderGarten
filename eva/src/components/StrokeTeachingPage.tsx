@@ -273,7 +273,8 @@ const StrokeTeachingPage: React.FC = () => {
     setMessages((prev) => {
       const newMessage = {
         key: prev.length,
-        image: base64Image,
+        image: base64Data,
+        displayImg: base64Image,
         isUser: true,
         text: "", // initially empty
       };
