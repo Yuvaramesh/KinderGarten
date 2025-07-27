@@ -13,6 +13,7 @@ import { geminiVision } from "@/lib/gemini-vision";
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { ElevenLabsClient } from "elevenlabs";
+import ReactMarkdown from "react-markdown";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -245,34 +246,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               >
                 {message.role === "assistant" &&
                 message.content.includes("- ") ? (
-                  <div>
-                    <p className="text-sm mb-2">
-                      {message.content.split("\n")[0]}
-                    </p>
-                    <ul className="list-disc pl-5 text-sm space-y-1">
-                      {message.content
-                        .split("\n")
-                        .filter((line) => line.trim().startsWith("- "))
-                        .map((line, idx) => (
-                          <li key={idx}>{line.substring(2)}</li>
-                        ))}
-                    </ul>
-                    <p className="text-sm mt-3">
-                      {message.content
-                        .split("\n")
-                        .filter(
-                          (line) =>
-                            !line.trim().startsWith("- ") &&
-                            line !== message.content.split("\n")[0]
-                        )
-                        .join("\n")}{" "}
-                    </p>
+                  <div className="prose text-white max-w-none">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 ) : (
                   <div className=" group">
-                    <p className="text-sm text-white whitespace-pre-wrap">
-                      {message.content}
-                    </p>
+                    <div className="prose text-white max-w-none">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
                     {message.role === "assistant" && (
                       <div className=" w-full flex justify-end">
                         <HiSpeakerWave

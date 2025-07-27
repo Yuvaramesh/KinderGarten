@@ -1,11 +1,13 @@
 import React from "react";
 import { Button } from "./ui/button";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   key: number;
   text?: string;
   image?: string;
   isUser?: boolean;
+  displayImg?: string; // Optional property for displaying images
 }
 
 interface ChatUIProps {
@@ -30,17 +32,19 @@ const ChatUI: React.FC<ChatUIProps> = ({ onClose, messages }) => {
               message.isUser ? "bg-blue-100 ml-auto" : "bg-gray-100"
             } max-w-[80%]`}
           >
-            {message.image && (
+            {message.displayImg && (
               <img
-                src={message.image}
+                src={message.displayImg}
                 alt="User uploaded"
                 className="mt-2 rounded-lg"
               />
             )}
             {message.text && (
-              <p className="text-sm whitespace-pre-line">
-                {message.isUser ? message.text : message.text}
-              </p>
+              <div className="prose max-w-none">
+                <ReactMarkdown>
+                  {message.isUser ? message.text : message.text}
+                </ReactMarkdown>
+              </div>
             )}
           </div>
         ))}
