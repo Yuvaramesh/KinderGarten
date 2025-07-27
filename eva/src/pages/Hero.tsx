@@ -59,16 +59,16 @@ const Heropage = () => {
                 />
                 HandWriting
               </h2>
-              <p className="  text-xl capitalize leading-10 text-zinc-600">
+              <p className="  text-xl capitalize leading-10 text-zinc-600"><br></br>
                 <img src="/icon2.png" className=" inline-block size-8" />
-                Elevate your language mastery with AI-powered
+                Elevate your Handwriting with AI-powered
                 <img src="/icon2.png" className=" inline-block size-8" />{" "}
-                grammar
+                Feedback System
                 <img src="/icon1.png" className=" inline-block size-8" />
                 checks,
                 <img src="/icon1.png" className=" inline-block size-8" />{" "}
-                multilingual pronunciation, interactive word coaching , and
-                dynamic learning tools.
+                multilingual, interactive , and
+                improve Handwriting.
               </p>
             </div>
             <Button
